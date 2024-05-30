@@ -84,6 +84,9 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
+-- Vim background
+vim.o.background = 'light'
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -103,6 +106,10 @@ vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
 vim.opt.relativenumber = true
+
+-- tab size
+-- vim.opt.tabstop = 2
+-- vim.opt.shiftwidth = 2
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -149,10 +156,13 @@ vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 vim.opt.inccommand = 'split'
 
 -- Show which line your cursor is on
-vim.opt.cursorline = true
+vim.opt.cursorline = false
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
+
+-- Make your cursor fat in all modes
+vim.opt.guicursor = 'n-v-i-c:block-Cursor'
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -352,6 +362,11 @@ require('lazy').setup({
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
         --   },
         -- },
+        defaults = {
+          path_display = {
+            'filename_first',
+          },
+        },
         -- pickers = {}
         extensions = {
           ['ui-select'] = {
@@ -412,7 +427,13 @@ require('lazy').setup({
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
+      { 'j-hui/fidget.nvim', opts = {
+        notification = {
+          window = {
+            winblend = 0,
+          },
+        },
+      } },
 
       -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
@@ -521,6 +542,33 @@ require('lazy').setup({
         end,
       })
 
+      -- Customize border:
+      -- Specify how the border looks like
+      local border = {
+        { '┌', 'FloatBorder' },
+        { '─', 'FloatBorder' },
+        { '┐', 'FloatBorder' },
+        { '│', 'FloatBorder' },
+        { '┘', 'FloatBorder' },
+        { '─', 'FloatBorder' },
+        { '└', 'FloatBorder' },
+        { '│', 'FloatBorder' },
+      }
+
+      -- Add the border on hover and on signature help popup window
+      local handlers = {
+        ['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = border }),
+        ['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border }),
+      }
+
+      -- Add border to the diagnostic popup window
+      vim.diagnostic.config {
+        virtual_text = {
+          prefix = '■ ', -- Could be '●', '▎', 'x', '■', , 
+        },
+        float = { border = border },
+      }
+
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
       --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
@@ -548,11 +596,16 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         --python server
-        pyright = {},
+        pyright = {
+          handlers = handlers,
+        },
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        tsserver = {},
+        tsserver = {
+          handlers = handlers,
+        },
         --tailwindcss
         tailwindcss = {
+          handlers = handlers,
           settings = {
             tailwindCSS = {
               classAttributes = { 'class', 'className', 'class:list', 'classList', 'ngClass' },
@@ -572,6 +625,7 @@ require('lazy').setup({
         --
 
         lua_ls = {
+          handlers = handlers,
           -- cmd = {...},
           -- filetypes = { ...},
           -- capabilities = {},
@@ -698,6 +752,10 @@ require('lazy').setup({
       luasnip.config.setup {}
 
       cmp.setup {
+        window = {
+          completion = cmp.config.window.bordered(),
+          documentation = cmp.config.window.bordered(),
+        },
         snippet = {
           expand = function(args)
             luasnip.lsp_expand(args.body)
@@ -760,47 +818,133 @@ require('lazy').setup({
     end,
   },
 
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'ellisonleao/gruvbox.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
-    init = function()
-      require('gruvbox').setup {
-        terminal_colors = true, -- add neovim terminal colors
-        undercurl = true,
-        underline = true,
-        bold = true,
-        italic = {
-          strings = true,
-          emphasis = true,
-          comments = true,
-          operators = false,
-          folds = true,
+  -- { -- You can easily change to a different colorscheme.
+  --   -- Change the name of the colorscheme plugin below, and then
+  --   -- change the command in the config to whatever the name of that colorscheme is.
+  --   --
+  --   -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
+  --   'ellisonleao/gruvbox.nvim',
+  --   priority = 1000, -- Make sure to load this before all the other start plugins.
+  --   init = function()
+  --     require('gruvbox').setup {
+  --       terminal_colors = true, -- add neovim terminal colors
+  --       undercurl = true,
+  --       underline = true,
+  --       bold = true,
+  --       italic = {
+  --         strings = true,
+  --         emphasis = true,
+  --         comments = true,
+  --         operators = false,
+  --         folds = true,
+  --       },
+  --       strikethrough = true,
+  --       invert_selection = false,
+  --       invert_signs = false,
+  --       invert_tabline = false,
+  --       invert_intend_guides = false,
+  --       inverse = true, -- invert background for search, diffs, statuslines and errors
+  --       contrast = '', -- can be "hard", "soft" or empty string
+  --       palette_overrides = {},
+  --       overrides = {},
+  --       dim_inactive = false,
+  --       transparent_mode = false,
+  --     }
+  --     -- Load the colorscheme here.
+  --     -- Like many other themes, this one has different styles, and you could load
+  --     -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
+  --     vim.cmd.colorscheme 'gruvbox'
+  --
+  --     -- You can configure highlights by doing something like:
+  --     vim.cmd.hi 'Comment gui=none'
+  --   end,
+  -- },
+  --
+  {
+    'catppuccin/nvim',
+    name = 'catppuccin',
+    priority = 1000,
+    config = function()
+      require('catppuccin').setup {
+        flavour = 'mocha', -- latte, frappe, macchiato, mocha
+        background = { -- :h background
+          light = 'latte',
+          dark = 'mocha',
         },
-        strikethrough = true,
-        invert_selection = false,
-        invert_signs = false,
-        invert_tabline = false,
-        invert_intend_guides = false,
-        inverse = true, -- invert background for search, diffs, statuslines and errors
-        contrast = '', -- can be "hard", "soft" or empty string
-        palette_overrides = {},
-        overrides = {},
-        dim_inactive = false,
-        transparent_mode = false,
+        transparent_background = true, -- disables setting the background color.
+        show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
+        term_colors = false, -- sets terminal colors (e.g. `g:terminal_color_0`)
+        dim_inactive = {
+          enabled = false, -- dims the background color of inactive window
+          shade = 'dark',
+          percentage = 0.15, -- percentage of the shade to apply to the inactive window
+        },
+        no_italic = false, -- Force no italic
+        no_bold = false, -- Force no bold
+        no_underline = false, -- Force no underline
+        styles = { -- Handles the styles of general hi groups (see `:h highlight-args`):
+          comments = { 'italic' }, -- Change the style of comments
+          conditionals = {},
+          loops = {},
+          functions = {},
+          keywords = {},
+          strings = {},
+          variables = {},
+          numbers = {},
+          booleans = {},
+          properties = {},
+          types = {},
+          operators = {},
+          -- miscs = {}, -- Uncomment to turn off hard-coded styles
+        },
+        color_overrides = {},
+        custom_highlights = {},
+        default_integrations = true,
+        integrations = {
+          fidget = true,
+          cmp = true,
+          gitsigns = true,
+          nvimtree = true,
+          treesitter = true,
+          notify = true,
+          mini = {
+            enabled = true,
+            indentscope_color = '',
+          },
+          -- For more plugins integrations please scroll down (https://github.com/catppuccin/nvim#integrations)
+          barbar = true,
+          telescope = {
+            enabled = true,
+          },
+          indent_blankline = {
+            enabled = true,
+            scope_color = 'text', -- catppuccin color (eg. `lavender`) Default: text
+            colored_indent_levels = false,
+          },
+          native_lsp = {
+            enabled = true,
+            virtual_text = {
+              errors = { 'italic' },
+              hints = { 'italic' },
+              warnings = { 'italic' },
+              information = { 'italic' },
+            },
+            underlines = {
+              errors = { 'underline' },
+              hints = { 'underline' },
+              warnings = { 'underline' },
+              information = { 'underline' },
+            },
+            inlay_hints = {
+              background = true,
+            },
+          },
+        },
       }
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'gruvbox'
-
-      -- You can configure highlights by doing something like:
-      vim.cmd.hi 'Comment gui=none'
+      vim.cmd.colorscheme 'catppuccin-mocha'
     end,
   },
+  --
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
@@ -897,9 +1041,9 @@ require('lazy').setup({
       require('lualine').setup {
         options = {
           icons_enabled = true,
-          theme = 'gruvbox',
-          component_separators = { left = '', right = '' },
-          section_separators = { left = '', right = '' },
+          theme = 'catppuccin-mocha',
+          component_separators = '',
+          section_separators = { left = '', right = '' },
           disabled_filetypes = {
             statusline = {},
             winbar = {},
@@ -1040,6 +1184,46 @@ require('lazy').setup({
       }
     end,
   },
+  -- Transparency
+  -- {
+  --   'xiyaowong/transparent.nvim',
+  --   config = function()
+  --     require('transparent').setup { -- Optional, you don't have to run setup.
+  --       groups = { -- table: default groups
+  --         'Normal',
+  --         'NormalNC',
+  --         'Comment',
+  --         'Constant',
+  --         'Special',
+  --         'Identifier',
+  --         'Statement',
+  --         'PreProc',
+  --         'Type',
+  --         'Underlined',
+  --         'Todo',
+  --         'String',
+  --         'Function',
+  --         'Conditional',
+  --         'Repeat',
+  --         'Operator',
+  --         'Structure',
+  --         'LineNr',
+  --         'NonText',
+  --         'SignColumn',
+  --         'CursorLine',
+  --         'CursorLineNr',
+  --         'StatusLine',
+  --         'StatusLineNC',
+  --         'EndOfBuffer',
+  --       },
+  --       extra_groups = {
+  --         'NormalFloat',
+  --         'NvimTreeNormal',
+  --       }, -- table: additional groups that should be cleared
+  --       exclude_groups = {}, -- table: groups you don't want to clear
+  --     }
+  --   end,
+  -- },
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
