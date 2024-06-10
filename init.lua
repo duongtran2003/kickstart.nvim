@@ -867,10 +867,10 @@ require('lazy').setup({
     priority = 1000,
     config = function()
       require('catppuccin').setup {
-        flavour = 'mocha', -- latte, frappe, macchiato, mocha
+        flavour = 'macchiato', -- latte, frappe, macchiato, mocha
         background = { -- :h background
           light = 'latte',
-          dark = 'mocha',
+          dark = 'macchiato',
         },
         transparent_background = true, -- disables setting the background color.
         show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
@@ -942,7 +942,7 @@ require('lazy').setup({
           },
         },
       }
-      vim.cmd.colorscheme 'catppuccin-mocha'
+      vim.cmd.colorscheme 'catppuccin-macchiato'
     end,
   },
   --
@@ -1043,9 +1043,9 @@ require('lazy').setup({
       require('lualine').setup {
         options = {
           icons_enabled = true,
-          theme = 'catppuccin-mocha',
+          theme = 'catppuccin-macchiato',
           component_separators = '',
-          section_separators = { left = '', right = '' },
+          section_separators = { left = '', right = '' },
           disabled_filetypes = {
             statusline = {},
             winbar = {},
@@ -1060,7 +1060,7 @@ require('lazy').setup({
           },
         },
         sections = {
-          lualine_a = { 'mode' },
+          lualine_a = { { 'mode', separator = { left = '' }, right_padding = 2 } },
           lualine_b = { 'branch', 'diff', 'diagnostics' },
           lualine_c = {
             {
@@ -1074,7 +1074,9 @@ require('lazy').setup({
           },
           lualine_x = { 'encoding', 'fileformat', 'filetype' },
           lualine_y = { 'progress' },
-          lualine_z = { 'location' },
+          lualine_z = {
+            { 'location', separator = { right = '' }, left_padding = 2 },
+          },
         },
         inactive_sections = {
           lualine_a = {},
