@@ -781,7 +781,7 @@ require('lazy').setup({
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
-          ['<Tab>'] = cmp.mapping.confirm { select = true },
+          ['<C-y>'] = cmp.mapping.confirm { select = true },
 
           -- Manually trigger a completion from nvim-cmp.
           --  Generally you don't need this, because nvim-cmp will display
@@ -1094,30 +1094,30 @@ require('lazy').setup({
     end,
   },
   -- A file explorer tree, like in ****de
-  {
-    'nvim-tree/nvim-tree.lua',
-    version = '*',
-    lazy = false,
-    event = 'VeryLazy',
-    dependencies = {
-      'nvim-tree/nvim-web-devicons',
-    },
-    config = function()
-      local api = require 'nvim-tree.api'
-      -- keymap
-      vim.keymap.set('n', '<leader><leader>', ':b', { desc = 'Pick buffer' })
-      vim.keymap.set('n', '-', function()
-        if api.tree.is_visible() then
-          api.tree.close()
-        else
-          api.tree.open()
-          vim.cmd 'wincmd p' --no focus
-        end
-      end, { desc = 'Toggle buffer tree', silent = true })
-
-      require('nvim-tree').setup {}
-    end,
-  },
+  -- {
+  --   'nvim-tree/nvim-tree.lua',
+  --   version = '*',
+  --   lazy = false,
+  --   event = 'VeryLazy',
+  --   dependencies = {
+  --     'nvim-tree/nvim-web-devicons',
+  --   },
+  --   config = function()
+  --     local api = require 'nvim-tree.api'
+  --     -- keymap
+  --     vim.keymap.set('n', '<leader><leader>', ':b', { desc = 'Pick buffer' })
+  --     vim.keymap.set('n', '-', function()
+  --       if api.tree.is_visible() then
+  --         api.tree.close()
+  --       else
+  --         api.tree.open()
+  --         vim.cmd 'wincmd p' --no focus
+  --       end
+  --     end, { desc = 'Toggle buffer tree', silent = true })
+  --
+  --     require('nvim-tree').setup {}
+  --   end,
+  -- },
   --A indent line guide
   {
     'lukas-reineke/indent-blankline.nvim',
@@ -1227,7 +1227,7 @@ require('lazy').setup({
       -- Pin/unpin buffer
       map('n', '<A-p>', '<Cmd>BufferPin<CR>', opts)
       -- Close buffer
-      map('n', '<A-c>', '<Cmd>BufferClose<CR>', opts)
+      map('n', '<A-c>', '<Cmd>BufferClose!<CR>', opts)
       -- Wipeout buffer
       --                 :BufferWipeout
       -- Close commands
@@ -1252,46 +1252,15 @@ require('lazy').setup({
       }
     end,
   },
-  -- Transparency
-  -- {
-  --   'xiyaowong/transparent.nvim',
-  --   config = function()
-  --     require('transparent').setup { -- Optional, you don't have to run setup.
-  --       groups = { -- table: default groups
-  --         'Normal',
-  --         'NormalNC',
-  --         'Comment',
-  --         'Constant',
-  --         'Special',
-  --         'Identifier',
-  --         'Statement',
-  --         'PreProc',
-  --         'Type',
-  --         'Underlined',
-  --         'Todo',
-  --         'String',
-  --         'Function',
-  --         'Conditional',
-  --         'Repeat',
-  --         'Operator',
-  --         'Structure',
-  --         'LineNr',
-  --         'NonText',
-  --         'SignColumn',
-  --         'CursorLine',
-  --         'CursorLineNr',
-  --         'StatusLine',
-  --         'StatusLineNC',
-  --         'EndOfBuffer',
-  --       },
-  --       extra_groups = {
-  --         'NormalFloat',
-  --         'NvimTreeNormal',
-  --       }, -- table: additional groups that should be cleared
-  --       exclude_groups = {}, -- table: groups you don't want to clear
-  --     }
-  --   end,
-  -- },
+  {
+    'stevearc/oil.nvim',
+    -- Optional dependencies
+    opts = {},
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    keys = {
+      { '-', '<cmd>Oil<cr>', desc = 'Open parent directory' },
+    },
+  },
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
