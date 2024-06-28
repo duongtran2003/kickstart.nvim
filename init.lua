@@ -1260,6 +1260,14 @@ require('lazy').setup({
     keys = {
       { '-', '<cmd>Oil<cr>', desc = 'Open parent directory' },
     },
+    config = function()
+      require('oil').setup {
+        view_options = {
+          show_hidden = true,
+          natural_order = false,
+        },
+      }
+    end,
   },
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
