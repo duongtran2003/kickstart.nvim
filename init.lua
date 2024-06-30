@@ -565,7 +565,7 @@ require('lazy').setup({
       -- Add border to the diagnostic popup window
       vim.diagnostic.config {
         virtual_text = {
-          prefix = '■ ', -- Could be '●', '▎', 'x', '■', , 
+          prefix = '▶', -- Could be '●', '▎', 'x', '■', , 
         },
         float = { border = border },
       }
@@ -764,6 +764,10 @@ require('lazy').setup({
         },
         completion = { completeopt = 'menu,menuone,noinsert' },
 
+        -- nvim highlight color integration
+        formatting = {
+          format = require('nvim-highlight-colors').format,
+        },
         -- For an understanding of why these mappings were
         -- chosen, you will need to read `:help ins-completion`
         --
@@ -1025,10 +1029,15 @@ require('lazy').setup({
   -- Self-explanatory, plugin to create a matching bracket
   {
     'windwp/nvim-autopairs',
-    event = 'InsertEnter',
-    config = true,
-    -- use opts = {} for passing setup options
-    -- this is equalent to setup({}) function
+    -- Optional dependency
+    dependencies = { 'hrsh7th/nvim-cmp' },
+    config = function()
+      require('nvim-autopairs').setup {}
+      -- If you want to automatically add `(` after selecting a function or method
+      local cmp_autopairs = require 'nvim-autopairs.completion.cmp'
+      local cmp = require 'cmp'
+      cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
+    end,
   },
   --dev-icon
   {
@@ -1269,6 +1278,20 @@ require('lazy').setup({
       }
     end,
   },
+  -- Color highlighting
+  {
+    'brenoprata10/nvim-highlight-colors',
+    config = function()
+      -- Ensure termguicolors is enabled if not already
+      vim.opt.termguicolors = true
+      require('nvim-highlight-colors').setup {
+        render = 'virtual',
+        virtual_symbol = '●',
+        enable_tailwind = true,
+      }
+    end,
+  },
+
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
